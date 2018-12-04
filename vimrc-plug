@@ -1,3 +1,21 @@
+set nocompatible
+filetype off
+
+let mapleader=";"
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+"Ctrl-p 文件搜索(子目录)
+"Shift-f 文件搜索(最近打开)
+"Shift-p 函数搜索
+"Shift-m 符号搜索
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 call plug#begin('~/.vim/plugged')
 
 "color
@@ -5,19 +23,24 @@ Plug 'tomasr/molokai'
 Plug 'octol/vim-cpp-enhanced-highlight'
 
 "search
-Plug 'Yggdroot/LeaderF', { 'do': '.\install.bat' }
+Plug 'Yggdroot/LeaderF', { 'do': '.\install.sh' }
+Plug 'dyng/ctrlsf.vim'
 
 "windows choose
 Plug 't9md/vim-choosewin'
 
 "golang autocomplete
-Plug 'fatih/vim-go' , { 'do': ':GoInstallBinaries' }
+Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries' } 
 Plug 'mdempsky/gocode', { 'rtp': 'vim', 'do': '~/.vim/plugged/gocode/vim/symlink.sh' }
 
 "c/cpp autocomplete
 Plug 'Valloric/YouCompleteMe'
 Plug 'rdnetto/YCM-Generator', { 'branch': 'stable' }
 
+"ctags
+Plug 'ludovicchabant/vim-gutentags' " auto tags
+      
+      
 "Alternate Files quickly .c --> .h
 Plug 'vim-scripts/a.vim'
 
@@ -39,3 +62,6 @@ Plug 'scrooloose/nerdcommenter'         "code comment
 call plug#end()
 
 
+
+filetype plugin indent on
+syntax on

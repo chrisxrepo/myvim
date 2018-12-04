@@ -23,7 +23,8 @@ Plug 'tomasr/molokai'
 Plug 'octol/vim-cpp-enhanced-highlight'
 
 "search
-Plug 'Yggdroot/LeaderF', { 'do': '.\install.bat' }
+Plug 'Yggdroot/LeaderF', { 'do': '.\install.sh' }
+Plug 'dyng/ctrlsf.vim'
 
 "windows choose
 Plug 't9md/vim-choosewin'
@@ -36,6 +37,10 @@ Plug 'mdempsky/gocode', { 'rtp': 'vim', 'do': '~/.vim/plugged/gocode/vim/symlink
 Plug 'Valloric/YouCompleteMe'
 Plug 'rdnetto/YCM-Generator', { 'branch': 'stable' }
 
+"ctags
+Plug 'ludovicchabant/vim-gutentags' " auto tags
+      
+      
 "Alternate Files quickly .c --> .h
 Plug 'vim-scripts/a.vim'
 
@@ -63,19 +68,43 @@ call plug#end()
 set completeopt=menu,menuone
 let g:ycm_server_python_interpreter='/usr/bin/python'
 let g:ycm_global_ycm_extra_conf='~/.vim/.ycm_extra_conf.py'
-let g:ycm_collect_identifiers_from_tags_files = 1           " 开启 YCM 基于标签引擎
 let g:ycm_confirm_extra_conf=0
 
-let g:ycm_min_num_of_chars_for_completion=2	                  " 从第2个键入字符就开始罗列匹配项
+"使用ctags生成的tags文件
+let g:ycm_collect_identifiers_from_tags_files = 1           " 开启 YCM 基于标签引擎
+
+let g:ycm_min_num_of_chars_for_completion=2                   " 从第2个键入字符就开始罗列匹配项
 let g:ycm_complete_in_comments = 1                            " 在注释输入中也能补全
 let g:ycm_complete_in_strings = 1                             " 在字符串输入中也能补全
 let g:ycm_collect_identifiers_from_comments_and_strings = 0   " 注释和字符串中的文字也会被收入补全
 let g:ycm_show_diagnostics_ui = 0                             " 禁用语法检查
 
-inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<CR>" |            " 回车即选中当前项
+autocmd InsertLeave * if pumvisible() == 0|pclose|endif       " 离开插入模式后自动关闭预览窗口
+nmap <leader>d :YcmCompleter GoToDefinitionElseDeclaration<cr>"跳转
 
-nnoremap gd :YcmCompleter GoToDefinitionElseDeclaration<CR>
 
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""" ctags
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" gutentags搜索工程目录的标志，碰到这些文件/目录名就停止向上一级目录递归 "
+let g:gutentags_project_root = ['.root', '.svn', '.git', '.project', 'build', '.build', '.*']
+
+" 所生成的数据文件的名称 "
+let g:gutentags_ctags_tagfile = '.tags'
+
+" 将自动生成的 tags 文件全部放入 ~/.cache/tags 目录中，避免污染工程目录 "
+let s:vim_tags = expand('~/.cache/tags')
+let g:gutentags_cache_dir = s:vim_tags
+" 检测 ~/.cache/tags 不存在就新建 "
+if !isdirectory(s:vim_tags)
+   silent! call mkdir(s:vim_tags, 'p')
+endif
+
+" 配置 ctags 的参数 "
+let g:gutentags_ctags_extra_args = ['--fields=+niazS', '--extra=+q']
+let g:gutentags_ctags_extra_args += ['--c++-kinds=+pxI']
+let g:gutentags_ctags_extra_args += ['--c-kinds=+px']
+      
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 """ color
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -200,6 +229,27 @@ let g:Lf_HideHelp = 1
 let g:Lf_StlColorscheme = 'powerline'
 let g:Lf_PreviewResult = {'Function':0, 'BufTag':0}
 
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""" search - ctrlsf
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:ctrlsf_position = 'bottom'
+let g:ctrlsf_regex_pattern = 1
+let g:ctrlsf_default_view_mode = 'compact'
+let g:ctrlsf_case_sensitive = 'yes'
+let g:ctrlsf_default_root = 'project'
+let g:ctrlsf_auto_close = 0
+let g:ctrlsf_winsize = '30%'
+nmap <Leader>f :CtrlSF<CR>
+nmap <C-f> <Plug>CtrlSFPrompt
+
+let g:ctrlsf_auto_focus = {
+    \ "at": "start"
+    \ }
+let g:ctrlsf_auto_close = {
+    \ "normal" : 1,
+    \ "compact": 0
+    \}
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 通用设置
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -298,7 +348,16 @@ set path+=/Library/Developer/CommandLineTools/usr/include/c++/v1
 set path+=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" 通用快捷键
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+nmap <leader>w :w!<cr>      "保存
+nmap <leader>q :wq!<cr>     "保存退出
+
+"c/c++保存文件格式化
+autocmd Bufwritepre,filewritepre *.c,*.cpp,*.cc,*.h,*.hpp execute ":FormatCode"
+
+
+
+
 filetype plugin indent on
 syntax on
